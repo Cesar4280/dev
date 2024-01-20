@@ -1,28 +1,36 @@
-button {
-    cursor: pointer;
-    padding: 1rem 2rem;
-    border-radius: 2rem;
-    color: white;
-    border-style: none;
-    background-color: rgb(65, 131, 211);
-    font-size: 1rem;
-    font-weight: 600;
-    transition-property: background, color;
-    transition-timing-function: ease-in-out;
-    transition-duration: .2s;
-}
-
-.active {
-    color: rgb(65, 131, 211);
-    background-color: white;
-}
-
 .container {
     display: grid;
-    grid-template-columns: 1fr 1fr 1fr;
+    grid-template-columns: repeat(3, 1fr);
     grid-template-rows: repeat(3, 1fr);
-    background: #000;
-    border: .5rem solid #ddd;
-    width: 40rem;
-    height: 40rem;
+    width: 36rem;
+    height: 36rem;
+    margin: 1rem auto 0;
+    background-image: url(./assets/tic-tac-toe.svg);
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center center;
 }
+
+.container>.item {
+    
+}
+
+/* .container>.item {
+    border: .35rem solid #ddd;
+}
+
+.container>.item.no-border-top {
+    border-top: none;
+}
+
+.container>.item.no-border-left {
+    border-left: none;
+}
+
+.container>.item.no-border-right {
+    border-right: none;
+}
+
+.container>.item.no-border-bottom {
+    border-bottom: none;
+} */
