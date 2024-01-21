@@ -5,33 +5,55 @@
     width: 36rem;
     height: 36rem;
     margin: 1rem auto 0;
+    /*
     background-image: url(./assets/tic-tac-toe.svg);
     background-size: contain;
     background-repeat: no-repeat;
     background-position: center center;
+    */
 }
 
 .container>.item {
-    align-self: center;
-    justify-self: center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-width: .35rem;
+    border-style: solid;
+    border-color: #ddd;
 }
 
-/* .container>.item {
-    border: .35rem solid #ddd;
-}
-
-.container>.item.no-border-top {
+.container>.item.item-0 {
     border-top: none;
-}
-
-.container>.item.no-border-left {
     border-left: none;
 }
 
-.container>.item.no-border-right {
+.container>.item.item-1 {
+    border-top: none;
+}
+
+.container>.item.item-2 {
+    border-top: none;
     border-right: none;
 }
 
-.container>.item.no-border-bottom {
+.container>.item.item-3 {
+    border-left: none;
+}
+
+.container>.item.item-5 {
+    border-right: none;
+}
+
+.container>.item.item-6 {
+    border-left: none;
     border-bottom: none;
-} */
+}
+
+.container>.item.item-7 {
+    border-bottom: none;
+}
+
+.container>.item.item-8 {
+    border-right: none;
+    border-bottom: none;
+}

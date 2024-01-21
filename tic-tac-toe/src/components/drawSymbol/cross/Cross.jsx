@@ -1,4 +1,4 @@
-import FontAwesomeSvg from "../fontAwesomeSvg/FontAwesomeSvg.jsx"
+import FontAwesomeSvg from "../../fontAwesomeSvg/FontAwesomeSvg.jsx"
 
 export default function Cross({ viewport, design }) {
 
