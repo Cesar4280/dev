@@ -12,7 +12,8 @@
 }
 
 .container>.item {
-    
+    align-self: center;
+    justify-self: center;
 }
 
 /* .container>.item {
