@@ -1,10 +1,16 @@
+.board-game {
+    width: 25rem;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+}
+
 .container {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
     grid-template-rows: repeat(3, 1fr);
-    width: 36rem;
-    height: 36rem;
-    margin: 1rem auto 0;
+    width: 25rem;
+    height: 25rem;
     /*
     background-image: url(./assets/tic-tac-toe.svg);
     background-size: contain;
@@ -17,9 +23,9 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    border-width: .35rem;
+    border-width: .34rem;
     border-style: solid;
-    border-color: #ddd;
+    border-color: #d0d0d0;
 }
 
 .container>.item.item-0 {
@@ -56,4 +62,33 @@
 .container>.item.item-8 {
     border-right: none;
     border-bottom: none;
+}
+
+.board-game>.display-turn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 9rem;
+    font-size: 2rem;
+}
+
+.board-game>.scores {
+    height: 9rem;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+}
+
+.case-score {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    font-size: 1.1rem;
+    line-height: 2.25rem;
+}
+
+.case {
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }

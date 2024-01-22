@@ -1,21 +1,31 @@
 import { useState } from "react"
+import { useCounter } from "./hooks/useCounter.js"
 
 import "./App.css"
 
 import Square from "./components/square/Square.jsx"
 import DrawSymbol from "./components/drawSymbol/DrawSymbol.jsx"
+import Cross from "./components/drawSymbol/cross/Cross"
+import Circle from "./components/drawSymbol/circle/Circle"
 
 export default function App() {
 
+    // contansts
     const CROSS = Symbol("CROSS")
     const CIRCLE = Symbol("CIRCLE")
     const TIE = Symbol("TIE")
     const ONGOING = Symbol("ONGOING")
     const FINISHED = Symbol("FINISHED")
 
-    const PLAYERS = { [CROSS]: "CROSS", [CIRCLE]: "CIRCLE" }
-    const GAME_STATUS = { [ONGOING]: "ONGOING", [FINISHED]: "FINISHED", [TIE]: "TIE" }
-
+    const PLAYERS = {
+        [CROSS]: "CROSS",
+        [CIRCLE]: "CIRCLE"
+    }
+    const GAME_STATUS = {
+        [ONGOING]: "ONGOING",
+        [FINISHED]: "FINISHED",
+        [TIE]: "TIE"
+    }
     const WINNING_COMBINATIONS = [
         { NAME: "topRow", POSITIONS: [0, 1, 2] },
         { NAME: "middleRow", POSITIONS: [3, 4, 5] },
@@ -27,15 +37,23 @@ export default function App() {
         { NAME: "rightDiagonal", POSITIONS: [2, 4, 6] }
     ]
 
-    const EMPTY_SPACE = null;
-    // GAME_STATUS = CROSS - CIRCLE - TIE - NONE
+    const NONE = null
+    const EMPTY_SPACE = null
+    const INITIAL_SCORE = 0
+
     const EMPTY_BOARD = Array(9).fill(EMPTY_SPACE)
 
+    // useStates
     const [board, setBoard] = useState(EMPTY_BOARD)
     const [turn, setTurn] = useState(PLAYERS[CROSS])
     const [gameStatus, setGameStatus] = useState(GAME_STATUS[ONGOING])
 
-    const emptySpacesExist = (updatedBoard, positionsToCheck = EMPTY_SPACE) => {
+    // custom hooks
+    const croosScore = useCounter(INITIAL_SCORE)
+    const circleScore = useCounter(INITIAL_SCORE)
+    const tieScore = useCounter(INITIAL_SCORE)
+
+    const emptySpacesExist = (updatedBoard, positionsToCheck = NONE) => {
         return Array.isArray(positionsToCheck) && positionsToCheck.length === 3 ?
             positionsToCheck.some(index => updatedBoard[index] === EMPTY_SPACE) :
             updatedBoard.includes(EMPTY_SPACE)
@@ -44,34 +62,57 @@ export default function App() {
     const isWinnerWithThisCombination = (updatedBoard, combination) => {
         if (emptySpacesExist(updatedBoard, combination.POSITIONS)) return false
         const [FIRST, SECOND, THIRD] = combination.POSITIONS
-        const SQUARES = { FIRST: updatedBoard[FIRST], SECOND: updatedBoard[SECOND], THIRD: updatedBoard[THIRD] }
+        const SQUARES = {
+            FIRST: updatedBoard[FIRST],
+            SECOND: updatedBoard[SECOND],
+            THIRD: updatedBoard[THIRD]
+        }
         return SQUARES.FIRST.props.symbolType === SQUARES.SECOND.props.symbolType &&
             SQUARES.FIRST.props.symbolType === SQUARES.THIRD.props.symbolType
     }
 
-    const checkStatusGame = (updatedBoard) => {
+    const increaseScoreForPlayer = (player = NONE) => {
+        switch (player) {
+            case PLAYERS[CROSS]:
+                croosScore.increment()
+                break
+            case PLAYERS[CIRCLE]:
+                circleScore.increment()
+                break
+            default:
+                tieScore.increment()
+        }
+    }
+
+    const checkGameStatus = (updatedBoard) => {
+        let hasWinner = false
         for (const COMBINATION of WINNING_COMBINATIONS) {
-            const IS_WINNER = isWinnerWithThisCombination(updatedBoard, COMBINATION)
-            if (IS_WINNER) {
-                console.log(`Gano el jugador <<${turn}>>`)
-                return setGameStatus(GAME_STATUS[FINISHED])
+            hasWinner = isWinnerWithThisCombination(updatedBoard, COMBINATION)
+            if (hasWinner) {
+                setGameStatus(GAME_STATUS[FINISHED])
+                increaseScoreForPlayer(turn)
+                resetGame()
+                break
             }
         }
-        const IS_ONGOING = emptySpacesExist(updatedBoard)
-        const UPDATED_GAME_STATUS = GAME_STATUS[IS_ONGOING ? ONGOING : TIE]
-        console.log(UPDATED_GAME_STATUS)
-        return setGameStatus(UPDATED_GAME_STATUS)
+        if (!hasWinner) {
+            const CAN_CONTINUE = emptySpacesExist(updatedBoard)
+            if (!CAN_CONTINUE) {
+                setGameStatus(GAME_STATUS[TIE])
+                increaseScoreForPlayer(NONE)
+                resetGame()
+            }
+        }
     }
 
     const applyMove = (currentBoard, currentPlayer, squareIndex) => {
-        console.log({ board: currentBoard, turn: currentPlayer, index: squareIndex })
         const OPPONENT = currentPlayer === PLAYERS[CROSS] ? CIRCLE : CROSS
         const updatedBoard = Array.from(currentBoard)
         updatedBoard[squareIndex] = <DrawSymbol symbolType={currentPlayer} />
         console.log(updatedBoard)
         setTurn(PLAYERS[OPPONENT])
         setBoard(updatedBoard)
-        checkStatusGame(updatedBoard)
+        checkGameStatus(updatedBoard)
     }
 
     const canPlayerMark = (spaceToMark, currentGameStatus) => {
@@ -84,14 +125,47 @@ export default function App() {
         if (IS_ABLE_TO_MARK) applyMove(board, turn, spaceIndex)
     }
 
+    const resetGame = () => {
+        setBoard(EMPTY_BOARD)
+        setTurn(PLAYERS[CROSS])
+        setGameStatus(GAME_STATUS[ONGOING])
+    }
+
     return (
-        <div className="container">
-            {board.map((markOrEmpty, squareIndex) =>
-                <Square key={squareIndex} index={squareIndex} attemptToMark={attemptToMark}>
-                    {markOrEmpty}
-                </Square>
-            )}
-        </div>
+        <main className="board-game">
+            <section className="display-turn">
+                {turn === PLAYERS[CROSS]
+                    ? <Cross viewport={{ width: 50, height: 50 }} design={{ fill: "#e91f64" }} />
+                    : <Circle viewport={{ width: 35, height: 35 }} design={{ fill: "#0ea5e9" }} />}
+                    Turn
+            </section>
+            <section className="container">
+                {board.map((markOrEmpty, squareIndex) =>
+                    <Square key={squareIndex} index={squareIndex} attemptToMark={attemptToMark}>
+                        {markOrEmpty}
+                    </Square>
+                )}
+            </section>
+            <section className="scores">
+                <div className="case-score">
+                    {croosScore.counter} {/* <DrawSymbol symbolType={PLAYERS[CROSS]} /> */}
+                    <div className="case">
+                        <Cross viewport={{ width: 28, height: 28 }} design={{ fill: "#e91f64" }} /> PLAYER 1
+                    </div>
+                </div>
+                <div className="case-score">
+                    {tieScore.counter}
+                    <div>TIES</div>
+                </div>
+                <div className="case-score">
+                    {circleScore.counter} {/* <DrawSymbol symbolType={PLAYERS[CIRCLE]} /> */}
+                    <div className="case">
+                        <Circle viewport={{ width: 28, height: 28 }} design={{ fill: "#0ea5e9" }} />
+                        &nbsp; PLAYER 2
+                    </div>
+                </div>
+            </section>
+        </main >
     )
 
 }
