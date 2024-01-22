@@ -165,6 +165,9 @@ export default function App() {
                     </div>
                 </div>
             </section>
+            <section className="modal-game-over">
+                <DrawSymbol symbolType={turn} /> Wins!
+            </section>
         </main >
     )
 
