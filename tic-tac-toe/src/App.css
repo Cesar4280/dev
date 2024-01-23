@@ -1,18 +1,65 @@
+.container-board-game {
+    width: 100vw;
+    border-top: .3rem solid #eee;
+    border-bottom: .3rem solid #eee;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    background-image: url(./assets/wood.webp);
+    background-color: rgba(201, 190, 174, 0.6);
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-position: center;
+    background-blend-mode: soft-light;
+}
+
+.game-section {
+    width: 50vw;
+    position: relative;
+    background-color: #fff;
+    box-shadow: rgba(0, 0, 0, 0.35) 0px 5px 15px;
+}
+
 .board-game {
+    /* background-color: #e8b75b; */
     width: 25rem;
     margin: 0 auto;
     display: flex;
     flex-direction: column;
-    position: relative;
+}
+
+.overlay-mask {
+    visibility: hidden;
+    position: absolute;
+    inset: 0;
+    cursor: pointer;
+    /* background-color: rgba(0, 255, 157, 0.508); */
 }
 
 .modal-game-over {
-    position: absolute;
-    top: 0;
-    left: 0;
     width: 100%;
-    height: 100%;
-    background-color: rgba(0, 0, 0, .5);
+    height: calc(100% / 6.5);
+    position: absolute;
+    top: 50%;
+    left: 0%;
+    transform: translateY(-50%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+    font-weight: bold;
+    text-align: center;
+    background-color: rgba(0, 0, 0, 0.8);
+    line-height: 2.25rem;
+}
+
+.modal-game-over>.end-game {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2rem;
 }
 
 .container {
@@ -36,6 +83,8 @@
     border-width: .34rem;
     border-style: solid;
     border-color: #d0d0d0;
+    background-color: transparent;
+    cursor: pointer;
 }
 
 .container>.item.item-0 {
@@ -75,17 +124,17 @@
 }
 
 .board-game>.display-turn {
+    height: 6.5rem;
     display: flex;
     align-items: center;
     justify-content: center;
-    height: 9rem;
     font-size: 2rem;
 }
 
 .board-game>.scores {
-    height: 9rem;
     display: grid;
     grid-template-columns: repeat(3, 1fr);
+    height: 6.5rem;
 }
 
 .case-score {
@@ -101,4 +150,15 @@
     display: flex;
     justify-content: center;
     align-items: center;
+}
+
+.active {
+    visibility: visible;
+}
+
+/* smartphones, portrait iPhone, portrait 480x320 phones (Android) */
+@media (max-width:801px) {
+    .game-section {
+        width: 100vw;
+    }
 }

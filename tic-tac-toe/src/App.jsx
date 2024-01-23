@@ -13,9 +13,9 @@ export default function App() {
     // contansts
     const CROSS = Symbol("CROSS")
     const CIRCLE = Symbol("CIRCLE")
-    const TIE = Symbol("TIE")
+    const FINISHED_WITH_TIE = Symbol("FINISHED_WITH_TIE")
     const ONGOING = Symbol("ONGOING")
-    const FINISHED = Symbol("FINISHED")
+    const FINISHED_WITH_WINNER = Symbol("FINISHED_WITH_WINNER")
 
     const PLAYERS = {
         [CROSS]: "CROSS",
@@ -23,8 +23,8 @@ export default function App() {
     }
     const GAME_STATUS = {
         [ONGOING]: "ONGOING",
-        [FINISHED]: "FINISHED",
-        [TIE]: "TIE"
+        [FINISHED_WITH_WINNER]: "FINISHED_WITH_WINNER",
+        [FINISHED_WITH_TIE]: "FINISHED_WITH_TIE"
     }
     const WINNING_COMBINATIONS = [
         { NAME: "topRow", POSITIONS: [0, 1, 2] },
@@ -89,18 +89,18 @@ export default function App() {
         for (const COMBINATION of WINNING_COMBINATIONS) {
             hasWinner = isWinnerWithThisCombination(updatedBoard, COMBINATION)
             if (hasWinner) {
-                setGameStatus(GAME_STATUS[FINISHED])
+                setGameStatus(GAME_STATUS[FINISHED_WITH_WINNER])
                 increaseScoreForPlayer(turn)
-                resetGame()
+                // resetGame()
                 break
             }
         }
         if (!hasWinner) {
             const CAN_CONTINUE = emptySpacesExist(updatedBoard)
             if (!CAN_CONTINUE) {
-                setGameStatus(GAME_STATUS[TIE])
+                setGameStatus(GAME_STATUS[FINISHED_WITH_TIE])
                 increaseScoreForPlayer(NONE)
-                resetGame()
+                // resetGame()
             }
         }
     }
@@ -131,44 +131,62 @@ export default function App() {
         setGameStatus(GAME_STATUS[ONGOING])
     }
 
+    const displayEndGame = (gameStatus) => {
+        switch (gameStatus) {
+            case GAME_STATUS[FINISHED_WITH_TIE]:
+                return "Draw!"
+            case GAME_STATUS[FINISHED_WITH_WINNER]:
+                return `Player ${turn === PLAYERS[CROSS] ? 1 : 2} Wins!`
+            default:
+                return null
+        }
+    }
+
     return (
-        <main className="board-game">
-            <section className="display-turn">
-                {turn === PLAYERS[CROSS]
-                    ? <Cross viewport={{ width: 50, height: 50 }} design={{ fill: "#e91f64" }} />
-                    : <Circle viewport={{ width: 35, height: 35 }} design={{ fill: "#0ea5e9" }} />}
-                    Turn
-            </section>
-            <section className="container">
-                {board.map((markOrEmpty, squareIndex) =>
-                    <Square key={squareIndex} index={squareIndex} attemptToMark={attemptToMark}>
-                        {markOrEmpty}
-                    </Square>
-                )}
-            </section>
-            <section className="scores">
-                <div className="case-score">
-                    {croosScore.counter} {/* <DrawSymbol symbolType={PLAYERS[CROSS]} /> */}
-                    <div className="case">
-                        <Cross viewport={{ width: 28, height: 28 }} design={{ fill: "#e91f64" }} /> PLAYER 1
-                    </div>
-                </div>
-                <div className="case-score">
-                    {tieScore.counter}
-                    <div>TIES</div>
-                </div>
-                <div className="case-score">
-                    {circleScore.counter} {/* <DrawSymbol symbolType={PLAYERS[CIRCLE]} /> */}
-                    <div className="case">
-                        <Circle viewport={{ width: 28, height: 28 }} design={{ fill: "#0ea5e9" }} />
-                        &nbsp; PLAYER 2
-                    </div>
-                </div>
-            </section>
-            <section className="modal-game-over">
-                <DrawSymbol symbolType={turn} /> Wins!
-            </section>
-        </main >
+        <div className="container-board-game">
+            <div className="game-section">
+                <main className="board-game">
+                    <section className="display-turn">
+                        {turn === PLAYERS[CROSS]
+                            ? <Cross viewport={{ width: 50, height: 50 }} design={{ fill: "#e91f64" }} />
+                            : <Circle viewport={{ width: 35, height: 35 }} design={{ fill: "#0ea5e9" }} />}
+                        Turn
+                    </section>
+                    <section className="container">
+                        {board.map((markOrEmpty, squareIndex) =>
+                            <Square key={squareIndex} index={squareIndex} attemptToMark={attemptToMark}>
+                                {markOrEmpty}
+                            </Square>
+                        )}
+                    </section>
+                    <section className="scores">
+                        <div className="case-score">
+                            {croosScore.counter} {/* <DrawSymbol symbolType={PLAYERS[CROSS]} /> */}
+                            <div className="case">
+                                <Cross viewport={{ width: 28, height: 28 }} design={{ fill: "#e91f64" }} /> PLAYER 1
+                            </div>
+                        </div>
+                        <div className="case-score">
+                            {tieScore.counter}
+                            <div>TIES</div>
+                        </div>
+                        <div className="case-score">
+                            {circleScore.counter} {/* <DrawSymbol symbolType={PLAYERS[CIRCLE]} /> */}
+                            <div className="case">
+                                <Circle viewport={{ width: 28, height: 28 }} design={{ fill: "#0ea5e9" }} />
+                                &nbsp; PLAYER 2
+                            </div>
+                        </div>
+                    </section>
+                    <section className={`overlay-mask ${gameStatus !== GAME_STATUS[ONGOING] && "active"}`} onClick={resetGame}>
+                        <div className="modal-game-over">
+                            <h1 className="end-game">{displayEndGame(gameStatus)}</h1>
+                            <span className="reset-game">Press anywhere to play again.</span>
+                        </div>
+                    </section>
+                </main>
+            </div>
+        </div>
     )
 
 }
