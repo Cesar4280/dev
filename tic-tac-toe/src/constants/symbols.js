@@ -1,0 +1,5 @@
+export const CROSS = Symbol("CROSS")
+export const CIRCLE = Symbol("CIRCLE")
+export const ONGOING = Symbol("ONGOING")
+export const FINISHED_WITH_TIE = Symbol("FINISHED_WITH_TIE")
+export const FINISHED_WITH_WINNER = Symbol("FINISHED_WITH_WINNER")

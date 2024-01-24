@@ -1,11 +1,15 @@
-import Cross from "./cross/Cross.jsx"
-import Circle from "./circle/Circle.jsx"
+import Cross from "./fontAwesomeSvg/cross/Cross.jsx"
+import Circle from "./fontAwesomeSvg/circle/Circle.jsx"
 
-export default function DrawSymbol({ player = "CROSS", size = 123 }) {
-    const VIEWPORT = { width: size, height: size }
-    return (
-        player === "CROSS"
-            ? <Cross viewport={VIEWPORT} design={{ fill: "#e91f64" }} />
-            : <Circle viewport={VIEWPORT} design={{ fill: "#0ea5e9" }} />
-    )
+import { CROSS } from "../../constants/symbols.js"
+import { PLAYERS } from "../../constants/directories.js"
+import { INITIAL_SCORE as ZERO } from "../../constants/initialValues.js"
+
+export default function DrawSymbol({ player = PLAYERS[CROSS], size = ZERO }) {
+    const IS_CROSS = player === PLAYERS[CROSS]
+    const LENGTH_IN_PIXELS = size === ZERO ? IS_CROSS ? 50 : 35 : size
+    const MEASURES = { width: LENGTH_IN_PIXELS, height: LENGTH_IN_PIXELS }
+    return IS_CROSS ?
+        <Cross viewport={MEASURES} design={{ fill: "#e91f64" }} /> :
+        <Circle viewport={MEASURES} design={{ fill: "#0ea5e9" }} />
 }
