@@ -1,10 +1,11 @@
 import Cross from "./cross/Cross.jsx"
 import Circle from "./circle/Circle.jsx"
 
-export default function DrawSymbol({ symbolType = "CROSS", symbolSize = 0 }) {
+export default function DrawSymbol({ player = "CROSS", size = 123 }) {
+    const VIEWPORT = { width: size, height: size }
     return (
-        symbolType === "CROSS"
-            ? <Cross viewport={{ width: 123, height: 123 }} design={{ fill: "#e91f64" }} />
-            : <Circle viewport={{ width: 88, height: 88 }} design={{ fill: "#0ea5e9" }} />
+        player === "CROSS"
+            ? <Cross viewport={VIEWPORT} design={{ fill: "#e91f64" }} />
+            : <Circle viewport={VIEWPORT} design={{ fill: "#0ea5e9" }} />
     )
 }

@@ -37,11 +37,10 @@ export default function App() {
         { NAME: "rightDiagonal", POSITIONS: [2, 4, 6] }
     ]
 
-    const NONE = null
-    const EMPTY_SPACE = null
+    const EMPTY = null
     const INITIAL_SCORE = 0
 
-    const EMPTY_BOARD = Array(9).fill(EMPTY_SPACE)
+    const EMPTY_BOARD = Array(9).fill(EMPTY)
 
     // useStates
     const [board, setBoard] = useState(EMPTY_BOARD)
@@ -53,10 +52,10 @@ export default function App() {
     const circleScore = useCounter(INITIAL_SCORE)
     const tieScore = useCounter(INITIAL_SCORE)
 
-    const emptySpacesExist = (updatedBoard, positionsToCheck = NONE) => {
+    const emptySpacesExist = (updatedBoard, positionsToCheck = EMPTY) => {
         return Array.isArray(positionsToCheck) && positionsToCheck.length === 3 ?
-            positionsToCheck.some(index => updatedBoard[index] === EMPTY_SPACE) :
-            updatedBoard.includes(EMPTY_SPACE)
+            positionsToCheck.some(index => updatedBoard[index] === EMPTY) :
+            updatedBoard.includes(EMPTY)
     }
 
     const isWinnerWithThisCombination = (updatedBoard, combination) => {
@@ -67,11 +66,11 @@ export default function App() {
             SECOND: updatedBoard[SECOND],
             THIRD: updatedBoard[THIRD]
         }
-        return SQUARES.FIRST.props.symbolType === SQUARES.SECOND.props.symbolType &&
-            SQUARES.FIRST.props.symbolType === SQUARES.THIRD.props.symbolType
+        return SQUARES.FIRST.props.player === SQUARES.SECOND.props.player &&
+            SQUARES.FIRST.props.player === SQUARES.THIRD.props.player
     }
 
-    const increaseScoreForPlayer = (player = NONE) => {
+    const increaseScoreForPlayer = (player = EMPTY) => {
         switch (player) {
             case PLAYERS[CROSS]:
                 croosScore.increment()
@@ -99,24 +98,28 @@ export default function App() {
             const CAN_CONTINUE = emptySpacesExist(updatedBoard)
             if (!CAN_CONTINUE) {
                 setGameStatus(GAME_STATUS[FINISHED_WITH_TIE])
-                increaseScoreForPlayer(NONE)
+                increaseScoreForPlayer(EMPTY)
                 // resetGame()
             }
         }
     }
 
     const applyMove = (currentBoard, currentPlayer, squareIndex) => {
-        const OPPONENT = currentPlayer === PLAYERS[CROSS] ? CIRCLE : CROSS
+        let opponent = PLAYERS[CROSS], lengthInPixels = 123
+        if (currentPlayer === opponent) opponent = PLAYERS[CIRCLE]
+        else lengthInPixels = 88
+        /*const [OPPONENT, LENGTH_IN_PIXELS] = currentPlayer === PLAYERS[CROSS]
+            ? [CIRCLE, 123] : [CROSS, 88]*/
         const updatedBoard = Array.from(currentBoard)
-        updatedBoard[squareIndex] = <DrawSymbol symbolType={currentPlayer} />
+        updatedBoard[squareIndex] = <DrawSymbol player={currentPlayer} size={lengthInPixels} />
         console.log(updatedBoard)
-        setTurn(PLAYERS[OPPONENT])
+        setTurn(PLAYERS[opponent])
         setBoard(updatedBoard)
         checkGameStatus(updatedBoard)
     }
 
     const canPlayerMark = (spaceToMark, currentGameStatus) => {
-        return spaceToMark === EMPTY_SPACE && currentGameStatus === GAME_STATUS[ONGOING]
+        return spaceToMark === EMPTY && currentGameStatus === GAME_STATUS[ONGOING]
     }
 
     const attemptToMark = (spaceIndex) => {
@@ -138,7 +141,7 @@ export default function App() {
             case GAME_STATUS[FINISHED_WITH_WINNER]:
                 return `Player ${turn === PLAYERS[CROSS] ? 1 : 2} Wins!`
             default:
-                return null
+                return EMPTY
         }
     }
 
@@ -161,7 +164,7 @@ export default function App() {
                     </section>
                     <section className="scores">
                         <div className="case-score">
-                            {croosScore.counter} {/* <DrawSymbol symbolType={PLAYERS[CROSS]} /> */}
+                            {croosScore.counter} {/* <DrawSymbol player={PLAYERS[CROSS]} /> */}
                             <div className="case">
                                 <Cross viewport={{ width: 28, height: 28 }} design={{ fill: "#e91f64" }} /> PLAYER 1
                             </div>
@@ -171,7 +174,7 @@ export default function App() {
                             <div>TIES</div>
                         </div>
                         <div className="case-score">
-                            {circleScore.counter} {/* <DrawSymbol symbolType={PLAYERS[CIRCLE]} /> */}
+                            {circleScore.counter} {/* <DrawSymbol player={PLAYERS[CIRCLE]} /> */}
                             <div className="case">
                                 <Circle viewport={{ width: 28, height: 28 }} design={{ fill: "#0ea5e9" }} />
                                 &nbsp; PLAYER 2
