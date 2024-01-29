@@ -1,5 +1,3 @@
-
-
 class Teem {
     constructor(name, city, starts) {
         this.name = name,
