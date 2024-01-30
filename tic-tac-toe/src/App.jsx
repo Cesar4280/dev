@@ -3,20 +3,29 @@ import { useCounter } from "./hooks/useCounter.js"
 
 import "./App.css"
 
+import DisplayTurn from "./components/displayTurn/DisplayTurn.jsx"
 import Square from "./components/square/Square.jsx"
 import DrawSymbol from "./components/drawSymbol/DrawSymbol.jsx"
+import Modal from "./components/modal/Modal.jsx"
+
+import { EMPTY, EMPTY_BOARD, INITIAL_SCORE } from "./constants/initialValues.js"
 
 import {
     CROSS,
     CIRCLE,
     ONGOING,
-    FINISHED_WITH_TIE,
-    FINISHED_WITH_WINNER
+    FINISHED_WITH_WINNER,
+    FINISHED_WITH_TIE
 } from "./constants/symbols.js"
+
 import { PLAYERS, GAME_STATUS, WINNING_COMBINATIONS } from "./constants/directories.js"
-import { EMPTY, EMPTY_BOARD, INITIAL_SCORE } from "./constants/initialValues.js"
-import Modal from "./components/modal/Modal.jsx"
-import DisplayTurn from "./components/displayTurn/DisplayTurn.jsx"
+
+import {
+    calculateOpponent,
+    canPlayerMark,
+    emptySpacesExist,
+    isWinnerWithThisCombination
+} from "./utils/logic.js"
 
 export default function App() {
 
@@ -30,24 +39,20 @@ export default function App() {
     const circleScore = useCounter(INITIAL_SCORE)
     const tieScore = useCounter(INITIAL_SCORE)
 
-    const emptySpacesExist = (updatedBoard, positionsToCheck = EMPTY) => {
-        return Array.isArray(positionsToCheck) && positionsToCheck.length === 3 ?
-            positionsToCheck.some(index => updatedBoard[index] === EMPTY) :
-            updatedBoard.includes(EMPTY)
+    const attemptToMark = (spaceIndex) => {
+        const SPACE_TO_MARK = board[spaceIndex]
+        const IS_ABLE_TO_MARK = canPlayerMark(SPACE_TO_MARK, gameStatus)
+        if (IS_ABLE_TO_MARK) applyMove(board, turn, spaceIndex)
     }
 
-    const isWinnerWithThisCombination = (updatedBoard, combination) => {
-        if (emptySpacesExist(updatedBoard, combination.POSITIONS)) return false
-        const [FIRST, SECOND, THIRD] = combination.POSITIONS
-        const SQUARES = {
-            FIRST: updatedBoard[FIRST],
-            SECOND: updatedBoard[SECOND],
-            THIRD: updatedBoard[THIRD]
-        }
-        return SQUARES.FIRST.props.player === SQUARES.SECOND.props.player &&
-            SQUARES.FIRST.props.player === SQUARES.THIRD.props.player
+    const applyMove = (currentBoard, currentPlayer, squareIndex) => {
+        const updatedBoard = Array.from(currentBoard)
+        const LENGTH_IN_PIXELS = currentPlayer === PLAYERS[CIRCLE] ? 88 : 123
+        updatedBoard[squareIndex] = <DrawSymbol player={currentPlayer} size={LENGTH_IN_PIXELS} />
+        setBoard(updatedBoard)
+        checkGameStatus(updatedBoard, currentPlayer)
     }
-
+    
     const increaseScoreForPlayer = (player = EMPTY) => {
         switch (player) {
             case PLAYERS[CROSS]:
@@ -81,28 +86,6 @@ export default function App() {
                 increaseScoreForPlayer(EMPTY)
             }
         }
-    }
-
-    const calculateOpponent = (currentPlayer) => {
-        return currentPlayer === PLAYERS[CROSS] ? PLAYERS[CIRCLE] : PLAYERS[CROSS]
-    }
-
-    const applyMove = (currentBoard, currentPlayer, squareIndex) => {
-        const updatedBoard = Array.from(currentBoard)
-        const LENGTH_IN_PIXELS = currentPlayer === PLAYERS[CIRCLE] ? 88 : 123
-        updatedBoard[squareIndex] = <DrawSymbol player={currentPlayer} size={LENGTH_IN_PIXELS} />
-        setBoard(updatedBoard)
-        checkGameStatus(updatedBoard, currentPlayer)
-    }
-
-    const canPlayerMark = (spaceToMark, currentGameStatus) => {
-        return spaceToMark === EMPTY && currentGameStatus === GAME_STATUS[ONGOING]
-    }
-
-    const attemptToMark = (spaceIndex) => {
-        const SPACE_TO_MARK = board[spaceIndex]
-        const IS_ABLE_TO_MARK = canPlayerMark(SPACE_TO_MARK, gameStatus)
-        if (IS_ABLE_TO_MARK) applyMove(board, turn, spaceIndex)
     }
 
     const resetGame = () => {
