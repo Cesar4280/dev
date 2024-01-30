@@ -16,6 +16,7 @@ import {
 import { PLAYERS, GAME_STATUS, WINNING_COMBINATIONS } from "./constants/directories.js"
 import { EMPTY, EMPTY_BOARD, INITIAL_SCORE } from "./constants/initialValues.js"
 import Modal from "./components/modal/Modal.jsx"
+import DisplayTurn from "./components/displayTurn/DisplayTurn.jsx"
 
 export default function App() {
 
@@ -60,36 +61,38 @@ export default function App() {
         }
     }
 
-    const checkGameStatus = (updatedBoard) => {
+    const checkGameStatus = (updatedBoard, currentPlayer) => {
         let hasWinner = false
         for (const COMBINATION of WINNING_COMBINATIONS) {
             hasWinner = isWinnerWithThisCombination(updatedBoard, COMBINATION)
             if (hasWinner) {
                 setGameStatus(GAME_STATUS[FINISHED_WITH_WINNER])
-                increaseScoreForPlayer(turn) // resetGame()
+                increaseScoreForPlayer(currentPlayer)
                 break
             }
         }
         if (!hasWinner) {
             const CAN_CONTINUE = emptySpacesExist(updatedBoard)
-            if (!CAN_CONTINUE) {
+            if (CAN_CONTINUE) {
+                const OPPONENT = calculateOpponent(currentPlayer)
+                setTurn(OPPONENT)
+            } else {
                 setGameStatus(GAME_STATUS[FINISHED_WITH_TIE])
-                increaseScoreForPlayer(EMPTY) // resetGame()
+                increaseScoreForPlayer(EMPTY)
             }
         }
     }
 
+    const calculateOpponent = (currentPlayer) => {
+        return currentPlayer === PLAYERS[CROSS] ? PLAYERS[CIRCLE] : PLAYERS[CROSS]
+    }
+
     const applyMove = (currentBoard, currentPlayer, squareIndex) => {
-        let opponent = PLAYERS[CROSS], lengthInPixels = 123
-        if (currentPlayer === opponent) opponent = PLAYERS[CIRCLE]
-        else lengthInPixels = 88
         const updatedBoard = Array.from(currentBoard)
-        updatedBoard[squareIndex] = <DrawSymbol player={currentPlayer} size={lengthInPixels} />
-        console.log("Current Turn:", currentPlayer);
-        console.log(updatedBoard)
+        const LENGTH_IN_PIXELS = currentPlayer === PLAYERS[CIRCLE] ? 88 : 123
+        updatedBoard[squareIndex] = <DrawSymbol player={currentPlayer} size={LENGTH_IN_PIXELS} />
         setBoard(updatedBoard)
-        setTurn(opponent)
-        checkGameStatus(updatedBoard)
+        checkGameStatus(updatedBoard, currentPlayer)
     }
 
     const canPlayerMark = (spaceToMark, currentGameStatus) => {
@@ -112,10 +115,7 @@ export default function App() {
         <div className="container-board-game">
             <div className="game-section">
                 <main className="board-game">
-                    <section className="display-turn">
-                        <DrawSymbol player={turn} />
-                        Turn
-                    </section>
+                    <DisplayTurn player={turn} isGameOver={gameStatus !== GAME_STATUS[ONGOING]} />
                     <section className="container">
                         {board.map((markOrEmpty, squareIndex) =>
                             <Square key={squareIndex} index={squareIndex} attemptToMark={attemptToMark}>
